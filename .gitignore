@@ -1,0 +1,13 @@
+__pycache__
+app.egg-info
+*.pyc
+.mypy_cache
+.ruff_cache
+.python-version
+.coverage
+.cache
+.venv
+.env
+.git
+.pytest_cache
+.idea
