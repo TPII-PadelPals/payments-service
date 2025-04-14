@@ -1,9 +1,9 @@
-import uuid
 from typing import Any
 
 from fastapi import APIRouter, status
 
 from app.core.config import settings
+from app.models.paiement import PaiementCreate, PaiementPublic
 
 # from app.utilities.dependencies import SessionDep
 
@@ -14,31 +14,26 @@ router = APIRouter()
 
 @router.post(
     "/",
-    # response_model=ItemsPublic,
-    status_code=status.HTTP_200_OK,
-    # responses={**NOT_ENOUGH_PERMISSIONS},  # type: ignore[dict-item]
-    # dependencies=[Depends(get_user_id_param)],
+    response_model=PaiementPublic,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_paiement(
     # session: SessionDep,
-    match_public_id: uuid.UUID,
-    match_title: str,
-    amount: float,
-    telegram_id: int,
+    paiement_in: PaiementCreate,
 ) -> Any:
     preference_data = {
         "items": [
             {
-                "id": match_public_id,
-                "title": match_title,
+                "id": str(paiement_in.match_public_id),
+                "title": paiement_in.match_title,
                 "quantity": 1,
-                "unit_price": amount,
+                "unit_price": paiement_in.amount,
             }
         ],
         "back_urls": {
-            "success": f"https://web.telegram.org/a/#{telegram_id}",
-            "pending": f"https://web.telegram.org/a/#{telegram_id}",
-            "failure": f"https://web.telegram.org/a/#{telegram_id}",
+            "success": f"https://web.telegram.org/a/#{paiement_in.user_telegram_id}",
+            "pending": f"https://web.telegram.org/a/#{paiement_in.user_telegram_id}",
+            "failure": f"https://web.telegram.org/a/#{paiement_in.user_telegram_id}",
         },
         "notification_url": "https://localhost:8004/notifications/mercadopago",
         "auto_return": "approved",
@@ -46,10 +41,5 @@ async def create_paiement(
 
     preference_response = mp_sdk.preference().create(preference_data)
     preference = preference_response["response"]
-    return {
-        "match_public_id": match_public_id,
-        "match_title": match_title,
-        "amount": amount,
-        "telegram_id": telegram_id,
-        "paiement_url": preference.body.init_point,
-    }
+
+    return PaiementPublic(url=preference["init_point"], **paiement_in.model_dump())
