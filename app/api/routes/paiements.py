@@ -35,7 +35,6 @@ async def create_paiement(
             "pending": f"https://web.telegram.org/a/#{paiement_in.user_telegram_id}",
             "failure": f"https://web.telegram.org/a/#{paiement_in.user_telegram_id}",
         },
-        "notification_url": "https://localhost:8004/notifications/mercadopago",
         "auto_return": "approved",
     }
 

@@ -110,3 +110,12 @@ The setup is also already configured at `.vscode/settings.json` so you can run t
 - https://fastapi.tiangolo.com/tutorial/bigger-applications/
 - https://docs.astral.sh/uv/
 - https://pre-commit.com/
+
+# Mercado Pago
+
+## Test
+
+### Ngrok
+
+### Paiements
+When testing paiements, close every MercadoPago accounts open in any browser.

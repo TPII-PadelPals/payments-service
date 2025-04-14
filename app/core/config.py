@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     ITEMS_SERVICE_API_KEY: str | None = None
 
     MERCADO_PAGO_PROD_ACCESS_TOKEN: str
+    MERCADO_PAGO_NOTIFICATION_SECRET_KEY: str
 
     # Testing
     POSTGRES_DB_TESTING: str
