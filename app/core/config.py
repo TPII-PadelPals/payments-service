@@ -1,5 +1,6 @@
-from typing import Literal
+from typing import Any, Literal
 
+import mercadopago  # type: ignore
 from pydantic import (
     computed_field,
 )
@@ -29,6 +30,8 @@ class Settings(BaseSettings):
     ITEMS_SERVICE_PORT: int | None = None
     ITEMS_SERVICE_API_KEY: str | None = None
 
+    MERCADO_PAGO_PROD_ACCESS_TOKEN: str
+
     # Testing
     POSTGRES_DB_TESTING: str
 
@@ -43,6 +46,11 @@ class Settings(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def MERCADO_PAGO_SDK(self) -> Any:
+        return mercadopago.SDK(self.MERCADO_PAGO_PROD_ACCESS_TOKEN)
 
 
 class TestSettings(Settings):
