@@ -185,4 +185,4 @@ Log out from every MercadoPago account of every browser. Then copy the payment `
 Note: If the MercadoPago requires a verification code to complete the transaction, use the last 6 numbers of the **buyer** Access Token (only available after creating a MercadoPago app with this account).
 
 #### 3. See MercadoPago notifications
-As we setup up earlier, MercadoPago will send notifications to `/api/v1/payments/notifications/mercadopago` where `merchant_orders` and `payments` are handled and displayed in `docker compose logs`.
+As we setup up earlier, MercadoPago will send notifications to `/api/v1/payments/notifications/mercadopago` are handled and displayed in `docker compose logs`. Notifications of type `merchant_orders` and `payments`, will log `[Merchant Order] '<match_title>': <DONE/WIP>`, whereas every other will display the request query params, headers and body.
