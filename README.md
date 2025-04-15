@@ -117,5 +117,5 @@ The setup is also already configured at `.vscode/settings.json` so you can run t
 
 ### Ngrok
 
-### Paiements
-When testing paiements, close every MercadoPago accounts open in any browser.
+### Payments
+When testing payments, close every MercadoPago accounts open in any browser.

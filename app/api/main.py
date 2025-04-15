@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 
-from app.api.routes import items, items_service, notifications, paiements
+from app.api.routes import items, items_service, notifications, payments
 from app.utilities.dependencies import get_token_header
 
-ROOT_ROUTE = "/paiments"
+ROOT_ROUTE = "/payments"
 
 api_router_with_api_key = APIRouter(
     dependencies=[Depends(get_token_header)],
@@ -14,7 +14,7 @@ api_router_with_api_key.include_router(
 )
 
 api_router_with_api_key.include_router(
-    paiements.router, prefix=f"{ROOT_ROUTE}", tags=["paiements"]
+    payments.router, prefix=f"{ROOT_ROUTE}", tags=["payments"]
 )
 
 

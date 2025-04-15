@@ -18,7 +18,7 @@ from app.core.config import settings
 mp_sdk = settings.MERCADO_PAGO_SDK
 
 
-async def test_create_match_paiement(
+async def test_create_match_payment(
     async_client: AsyncClient, x_api_key_header: dict[str, str]
 ) -> None:
     payload = {
@@ -28,7 +28,7 @@ async def test_create_match_paiement(
         "amount": 5000,
     }
     response = await async_client.post(
-        f"{settings.API_V1_STR}/paiements/",
+        f"{settings.API_V1_STR}/payments/",
         headers=x_api_key_header,
         json=payload,
     )
