@@ -32,6 +32,7 @@ class Settings(BaseSettings):
 
     MERCADO_PAGO_PROD_ACCESS_TOKEN: str
     MERCADO_PAGO_NOTIFICATION_SECRET_KEY: str
+    MERCADO_PAGO_NOTIFICATION_TEST_ID: str
 
     # Testing
     POSTGRES_DB_TESTING: str
