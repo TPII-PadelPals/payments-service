@@ -120,7 +120,7 @@ MercadoPago does not offer a fully local development framework, so it will be ne
 
 Here, we propose to use Ngrok which is a reverse proxy that allows to create secure tunnels between local apps and free public random domains. Follow installation steps in [ngrok-setup](https://dashboard.ngrok.com/get-started/setup).
 
-After installation, run ngrok as follows to deploy payment-service running on port 8004:
+After installation, run ngrok as follows to deploy payment-service running on corresponding port:
 ```
 ngrok http http://localhost:8004
 ```
