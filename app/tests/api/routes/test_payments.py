@@ -4,17 +4,6 @@ from httpx import AsyncClient
 
 from app.core.config import settings
 
-# Aceptar => Generar URL de Pago => Recibir Notificación => Actualizar estado de reserva
-# Rechazar (tras ser asignado) => Nada
-# Rechazar (tras haver aceptado) => Solicitar reembolso
-# ó
-# Solicitar reembolso desde MP => Recibir notificación => Actualizar estado de reserva
-
-# Generar URL de Pago
-# -> Endpoint para generar un pago a nuestra billetera
-# Notificaciones
-# -> Loguear por consola o mockear endpoint
-
 mp_sdk = settings.MERCADO_PAGO_SDK
 
 
