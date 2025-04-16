@@ -2,11 +2,8 @@ from typing import Any
 
 from fastapi import APIRouter, status
 
-from app.core.config import settings
 from app.models.payment import PaymentCreate, PaymentPublic
 from app.services.mercado_pago_payment_service import MercadoPagoPaymentService
-
-mp_sdk = settings.MERCADO_PAGO_SDK
 
 router = APIRouter()
 
