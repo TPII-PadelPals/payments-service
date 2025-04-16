@@ -113,6 +113,8 @@ The setup is also already configured at `.vscode/settings.json` so you can run t
 
 ## Mercado Pago
 
+In this project, we will be using Mercado Pago "Checkout Pro" solution for payments.
+
 ### Setup Ngrok
 MercadoPago does not offer a fully local development framework, so it will be needed to deploy the payment-service in order for it to fully interact with MercadoPago.
 
