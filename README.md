@@ -122,7 +122,7 @@ Here, we propose to use Ngrok which is a reverse proxy that allows to create sec
 
 After installation, run ngrok as follows to deploy payment-service running on corresponding port:
 ```
-ngrok http http://localhost:8004
+ngrok http http://localhost:8005
 ```
 The previous command will result in an output similar the next one:
 ```
