@@ -1,8 +1,10 @@
 services:
-  db:
+  payments-db:
     restart: "no"
     ports:
       - "${POSTGRES_PORT_EXT?Variable not set}:${POSTGRES_PORT?Variable not set}"
+    networks:
+      - tpii-network
 
   payments-service:
     restart: "no"
@@ -25,3 +27,11 @@ services:
           action: rebuild
     volumes:
       - ./htmlcov:/app/htmlcov
+    labels:
+      - "traefik.http.routers.payments.rule=PathPrefix(`/api/v1/payments`)"
+    networks:
+      - tpii-network
+
+networks:
+  tpii-network:
+    external: true
