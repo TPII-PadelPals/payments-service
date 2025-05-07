@@ -21,7 +21,7 @@ class BusinessService(BaseService):
     async def get_court(self, court_public_id: UUID) -> Court:
         courts = (await self.get("/api/v1/padel-courts/"))["data"]
         for court in courts:
-            if court["public_id"] == str(court_public_id):
+            if court["court_public_id"] == str(court_public_id):
                 return Court(**court)
         raise NotFoundException(f"Business '{court_public_id}'")
 
