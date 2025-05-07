@@ -2,8 +2,10 @@ from typing import Any
 
 from fastapi import APIRouter, status
 
-from app.models.payment import PaymentCreate, PaymentPublic
+from app.models.match_extended import MatchExtended
+from app.models.payment import PaymentPublic
 from app.services.mercado_pago_payment_service import MercadoPagoPaymentService
+from app.utilities.dependencies import SessionDep
 
 router = APIRouter()
 
@@ -14,6 +16,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def create_payment(
-    payment_in: PaymentCreate,
+    session: SessionDep,
+    match_extended: MatchExtended,
 ) -> Any:
-    return MercadoPagoPaymentService().create_payment(payment_in)
+    return await MercadoPagoPaymentService().create_payment(session, match_extended)
