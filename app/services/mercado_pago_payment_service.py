@@ -1,9 +1,10 @@
 import logging
-import uuid
 
 from app.core.config import settings
+from app.models.business import Business
 from app.models.match_extended import MatchExtended
-from app.models.payment import PaymentPublic
+from app.models.payment import PaymentCreate, PaymentPublic
+from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
 from app.utilities.dependencies import SessionDep
 
@@ -14,6 +15,13 @@ mp_sdk = settings.MERCADO_PAGO_SDK
 
 
 class MercadoPagoPaymentService:
+    N_PLAYERS = 4
+
+    def get_payment_title(
+        self, business: Business, match_extended: MatchExtended
+    ) -> str:
+        return f"PadelPals Match: {business.name} {match_extended.date} {match_extended.time}:00 hs"
+
     async def create_payment(
         self, session: SessionDep, match_extended: MatchExtended
     ) -> PaymentPublic:
@@ -21,21 +29,24 @@ class MercadoPagoPaymentService:
         court = await business_service.get_court(match_extended.court_public_id)
         business = await business_service.get_business(court.business_public_id)
 
-        payment_data = {
-            "match_public_id": match_extended.public_id,
-            "user_public_id": match_extended.match_players[0].user_public_id,
-            "public_id": str(uuid.uuid4()),
-            "title": f"PadelPals Match: {business.name} {match_extended.date} {match_extended.time}:00 hs",
-            "amount": court.price_per_hour / 4,
-        }
+        payment_create = PaymentCreate(
+            match_public_id=match_extended.public_id,
+            user_public_id=match_extended.match_players[0].user_public_id,
+            amount=(court.price_per_hour / self.N_PLAYERS),
+        )
+
+        repo_pay = PaymentsRepository(session)
+        payment = await repo_pay.create_payment(payment_create)
+
+        payment_title = self.get_payment_title(business, match_extended)
 
         preference_data = {
             "items": [
                 {
-                    "id": payment_data["public_id"],
-                    "title": payment_data["title"],
+                    "id": str(payment.public_id),
+                    "title": payment_title,
                     "quantity": 1,
-                    "unit_price": payment_data["amount"],
+                    "unit_price": payment.amount,
                 }
             ],
             "back_urls": {
@@ -48,4 +59,4 @@ class MercadoPagoPaymentService:
 
         preference_response = mp_sdk.preference().create(preference_data)
         preference = preference_response["response"]
-        return PaymentPublic(pay_url=preference["init_point"], **payment_data)
+        return PaymentPublic(pay_url=preference["init_point"], **payment.model_dump())
