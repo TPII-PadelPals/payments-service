@@ -26,10 +26,12 @@ class Settings(BaseSettings):
     API_KEY: str
 
     # Services
+    ITEMS_SERVICE_HTTP: bool = True
     ITEMS_SERVICE_HOST: str
     ITEMS_SERVICE_PORT: int | None = None
     ITEMS_SERVICE_API_KEY: str | None = None
 
+    BUSINESS_SERVICE_HTTP: bool = True
     BUSINESS_SERVICE_HOST: str
     BUSINESS_SERVICE_PORT: int | None = None
     BUSINESS_SERVICE_API_KEY: str | None = None
