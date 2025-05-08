@@ -3,7 +3,9 @@ import logging
 from app.core.config import settings
 from app.models.business import Business
 from app.models.match_extended import MatchExtended
+from app.models.mercado_pago_payment import MercadoPagoPaymentCreate
 from app.models.payment import PaymentCreate, PaymentPublic
+from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
 from app.utilities.dependencies import SessionDep
@@ -59,4 +61,10 @@ class MercadoPagoPaymentService:
 
         preference_response = mp_sdk.preference().create(preference_data)
         preference = preference_response["response"]
-        return PaymentPublic(pay_url=preference["init_point"], **payment.model_dump())
+        preference_id = preference["id"]
+        preference_init_point = preference["init_point"]
+        mp_payment_create = MercadoPagoPaymentCreate(
+            public_id=payment.public_id, preference_id=preference_id
+        )
+        await MercadoPagoPaymentsRepository(session).create_payment(mp_payment_create)
+        return PaymentPublic(pay_url=preference_init_point, **payment.model_dump())

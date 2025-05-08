@@ -7,6 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core.config import settings
 from app.models.business import Business
 from app.models.courts import Court
+from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
 
@@ -114,10 +115,16 @@ async def test_create_match_payment_stores_payment_data(
     assert response.status_code == 201
     content = response.json()
     payment_public_id = content["public_id"]
+    payment_url = content["pay_url"]
+    preference_id = payment_url.split("pref_id=")[1]
     PayRepo = PaymentsRepository(session)
     payment = await PayRepo.get_payment(payment_public_id)
     assert str(payment.public_id) == payment_public_id
     assert str(payment.match_public_id) == match_public_id
     assert str(payment.user_public_id) == user_public_id
     assert payment.amount == court_price / 4
-    # assert payment.preference_id is not None
+
+    MPPayRepo = MercadoPagoPaymentsRepository(session)
+    mp_payment = await MPPayRepo.get_payment(payment_public_id)
+    assert str(mp_payment.public_id) == payment_public_id
+    assert mp_payment.preference_id == preference_id

@@ -17,10 +17,6 @@ class PaymentInmutable(SQLModel):
     public_id: UUID = Field(default=uuid4(), unique=True)
 
 
-# class PaymentMercadoPago(SQLModel):
-#     preference_id: str = Field()
-
-
 class Payment(PaymentBase, PaymentInmutable, table=True):
     id: int = Field(default=None, primary_key=True)
 
