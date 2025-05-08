@@ -51,7 +51,7 @@ async def test_get_business(monkeypatch: Any) -> None:
         )
 
     async def mock_get(self: Any, url: str) -> Any:  # noqa: ARG001
-        assert url == "/api/v1/business/"
+        assert url == "/api/v1/businesses/"
         return {"data": expected_businesses, "count": len(expected_businesses)}
 
     monkeypatch.setattr(BusinessService, "get", mock_get)

@@ -13,7 +13,9 @@ class BusinessService(BaseService):
         """Init the service."""
         super().__init__()
         self._set_base_url(
-            settings.BUSINESS_SERVICE_HOST, settings.BUSINESS_SERVICE_PORT
+            settings.BUSINESS_SERVICE_HTTP,
+            settings.BUSINESS_SERVICE_HOST,
+            settings.BUSINESS_SERVICE_PORT,
         )
         if settings.BUSINESS_SERVICE_API_KEY:
             self.set_base_headers({"x-api-key": settings.BUSINESS_SERVICE_API_KEY})
@@ -26,8 +28,8 @@ class BusinessService(BaseService):
         raise NotFoundException(f"Business '{court_public_id}'")
 
     async def get_business(self, business_public_id: UUID) -> Business:
-        businesses = (await self.get("/api/v1/business/"))["data"]
+        businesses = (await self.get("/api/v1/businesses/"))["data"]
         for business in businesses:
-            if business["public_id"] == str(business_public_id):
+            if business["business_public_id"] == str(business_public_id):
                 return Business(**business)
         raise NotFoundException(f"Business '{business_public_id}'")
