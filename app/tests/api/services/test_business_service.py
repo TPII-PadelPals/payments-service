@@ -33,3 +33,34 @@ async def test_get_court(monkeypatch: Any) -> None:
             str(result_court.business_public_id) == expected_court["business_public_id"]
         )
         assert result_court.price_per_hour == expected_court["price_per_hour"]
+
+
+async def test_get_business(monkeypatch: Any) -> None:
+    n_businesses = 3
+    expected_businesses = []
+    for i in range(n_businesses):
+        expected_businesses.append(
+            {
+                "business_public_id": str(uuid.uuid4()),
+                "owner_id": str(uuid.uuid4()),
+                "latitude": 0.0 + i,
+                "longitude": 0.0 + i,
+                "name": f"Business {i}",
+                "location": f"Av. Business {i}",
+            }
+        )
+
+    async def mock_get(self: Any, url: str) -> Any:  # noqa: ARG001
+        assert url == "/api/v1/business/"
+        return {"data": expected_businesses, "count": len(expected_businesses)}
+
+    monkeypatch.setattr(BusinessService, "get", mock_get)
+    for expected_business in expected_businesses:
+        result_business = await BusinessService().get_business(
+            expected_business["business_public_id"]  # type: ignore
+        )
+        assert (
+            str(result_business.business_public_id)
+            == expected_business["business_public_id"]
+        )
+        assert str(result_business.name) == expected_business["name"]
