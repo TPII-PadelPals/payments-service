@@ -1,9 +1,11 @@
 import logging
+from typing import Any
 
 from app.core.config import settings
 from app.models.business import Business
 from app.models.match_extended import MatchExtended
 from app.models.mercado_pago_payment import (
+    MercadoPagoPayment,
     MercadoPagoPaymentCreate,
     MercadoPagoPaymentExtended,
 )
@@ -63,3 +65,8 @@ class MercadoPagoPaymentsService:
         return MercadoPagoPaymentExtended(
             pay_url=preference_init_point, **mp_payment.model_dump()
         )
+
+    async def get_payment(
+        self, session: SessionDep, **filters: Any
+    ) -> MercadoPagoPayment:
+        return await MercadoPagoPaymentsRepository(session).get_payment(**filters)

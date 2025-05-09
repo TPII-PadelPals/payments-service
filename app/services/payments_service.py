@@ -1,10 +1,11 @@
 import logging
+from typing import Any
 
 from app.core.config import settings
 from app.models.business import Business
 from app.models.courts import Court
 from app.models.match_extended import MatchExtended
-from app.models.payment import Payment, PaymentCreate, PaymentExtended
+from app.models.payment import Payment, PaymentCreate, PaymentExtended, PaymentUpdate
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
 from app.services.mercado_pago_payments_service import MercadoPagoPaymentsService
@@ -67,3 +68,10 @@ class PaymentsService:
             raise err
 
         return PaymentExtended(pay_url=mp_payment.pay_url, **payment.model_dump())
+
+    async def update_payment(
+        self, session: SessionDep, payment_update: PaymentUpdate, **filters: Any
+    ) -> Payment:
+        return await PaymentsRepository(session).update_payment(
+            payment_update, **filters
+        )

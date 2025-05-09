@@ -7,19 +7,19 @@ from fastapi import Request
 
 from app.core.config import settings
 from app.models.payment import PaymentStatus, PaymentUpdate
-from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
-from app.repository.payments_repository import PaymentsRepository
+from app.services.mercado_pago_payments_service import MercadoPagoPaymentsService
 from app.services.mercado_pago_service import MercadoPagoService
+from app.services.payments_service import PaymentsService
 from app.utilities.dependencies import SessionDep
 from app.utilities.exceptions import NotAuthorizedException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-mp_service = MercadoPagoService(settings.MERCADO_PAGO_SDK)
-
 
 class MercadoPagoNotificationsService:
+    mp_service = MercadoPagoService(settings.MERCADO_PAGO_SDK)
+
     def verify_request(self, request: Request) -> None:
         # Obtain the x-signature value from the header
         xSignature = request.headers.get("x-signature")
@@ -67,6 +67,24 @@ class MercadoPagoNotificationsService:
             # HMAC verification failed
             raise NotAuthorizedException()
 
+    async def _process_merchant_order(
+        self, session: SessionDep, merchant_order_id: int | None
+    ) -> None:
+        if merchant_order_id is None:
+            return
+
+        merchant_order_response = self.mp_service.get_merchant_order(merchant_order_id)
+
+        merchant_order = merchant_order_response["response"]
+        if merchant_order["status"] == "closed":
+            mp_payment = await MercadoPagoPaymentsService().get_payment(
+                session, preference_id=merchant_order["preference_id"]
+            )
+            payment_update = PaymentUpdate(status=PaymentStatus.PAID)
+            await PaymentsService().update_payment(
+                session, payment_update, public_id=mp_payment.public_id
+            )
+
     async def process_request(self, session: SessionDep, request: Request) -> None:
         self.verify_request(request)
 
@@ -82,7 +100,7 @@ class MercadoPagoNotificationsService:
         if notification_type == "topic_merchant_order_wh":
             merchant_order_id = ressource_id
         elif notification_type == "payment":
-            payment_response = mp_service.get_payment(ressource_id)
+            payment_response = self.mp_service.get_payment(ressource_id)
             payment = payment_response["response"]
             merchant_order_id = payment["order"]["id"]
         else:
@@ -90,15 +108,4 @@ class MercadoPagoNotificationsService:
             logger.info(f"{request.headers = }")
             logger.info(f"{await request.json() = }")
 
-        if merchant_order_id:
-            merchant_order_response = mp_service.get_merchant_order(merchant_order_id)
-            merchant_order = merchant_order_response["response"]
-            if merchant_order["status"] == "closed":
-                preference_id = merchant_order["preference_id"]
-                mp_payment = await MercadoPagoPaymentsRepository(session).get_payment(
-                    preference_id=preference_id
-                )
-                payment_update = PaymentUpdate(status=PaymentStatus.PAID)
-                await PaymentsRepository(session).update_payment(
-                    payment_update, public_id=mp_payment.public_id
-                )
+        await self._process_merchant_order(session, merchant_order_id)
