@@ -4,7 +4,7 @@ from typing import Any
 from app.core.config import settings
 from app.models.business import Business
 from app.models.match_extended import MatchExtended
-from app.models.mercado_pago_payment import (
+from app.models.mercadopago_payment import (
     MercadoPagoPayment,
     MercadoPagoPaymentCreate,
     MercadoPagoPaymentExtended,

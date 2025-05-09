@@ -6,7 +6,7 @@ from httpx import AsyncClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.config import settings
-from app.models.mercado_pago_payment import MercadoPagoPaymentCreate
+from app.models.mercadopago_payment import MercadoPagoPaymentCreate
 from app.models.payment import PaymentCreate, PaymentStatus
 from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
 from app.repository.payments_repository import PaymentsRepository

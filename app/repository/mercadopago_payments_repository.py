@@ -1,6 +1,6 @@
 from typing import Any
 
-from app.models.mercado_pago_payment import MercadoPagoPayment, MercadoPagoPaymentCreate
+from app.models.mercadopago_payment import MercadoPagoPayment, MercadoPagoPaymentCreate
 from app.repository.base_repository import BaseRepository
 
 

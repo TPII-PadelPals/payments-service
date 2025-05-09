@@ -13,7 +13,7 @@ from app.core.config import test_settings
 from app.core.db import get_async_engine, init_db
 from app.main import app
 from app.models.item import Item
-from app.models.mercado_pago_payment import MercadoPagoPayment
+from app.models.mercadopago_payment import MercadoPagoPayment
 from app.models.payment import Payment
 from app.tests.utils.utils import get_x_api_key_header
 from app.utilities.dependencies import get_db
