@@ -1,12 +1,18 @@
 from typing import Any
 
+from sqlalchemy.exc import IntegrityError
+
 from app.models.payment import Payment, PaymentCreate, PaymentUpdate
 from app.repository.base_repository import BaseRepository
+from app.utilities.exceptions import NotUniqueException
 
 
 class PaymentsRepository(BaseRepository):
-    # def _handle_commit_exceptions(self, err: IntegrityError) -> None:
-    #     raise err
+    def _handle_commit_exceptions(self, err: IntegrityError) -> None:
+        if "uq_user_match_constraint" in str(err.orig):
+            raise NotUniqueException("Payment")
+        else:
+            raise err
 
     async def create_payment(
         self, payment_create: PaymentCreate, should_commit: bool = True

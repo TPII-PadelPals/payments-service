@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 
 class MercadoPagoPaymentBase(SQLModel):
     public_id: UUID = Field(foreign_key="payments.public_id", ondelete="CASCADE")
-    preference_id: str = Field()
+    preference_id: str = Field(unique=True)
 
 
 class MercadoPagoPaymentCreate(MercadoPagoPaymentBase):

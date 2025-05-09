@@ -1,7 +1,7 @@
 from enum import Enum
 from uuid import UUID, uuid4
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, UniqueConstraint
 
 
 class PaymentStatus(str, Enum):
@@ -35,6 +35,13 @@ class Payment(PaymentBase, PaymentInmutable, PaymentMutable, table=True):
     id: int = Field(default=None, primary_key=True)
 
     __tablename__ = "payments"
+    __table_args__ = (
+        UniqueConstraint(
+            "match_public_id",
+            "user_public_id",
+            name="uq_user_match_constraint",
+        ),
+    )
 
 
 class PaymentURL(SQLModel):
