@@ -10,10 +10,10 @@ from app.models.mercado_pago_payment import MercadoPagoPaymentCreate
 from app.models.payment import PaymentCreate, PaymentStatus
 from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
 from app.repository.payments_repository import PaymentsRepository
-from app.services.mercado_pago_notifications_service import (
+from app.services.mercadopago_notifications_service import (
     MercadoPagoNotificationsService,
 )
-from app.services.mercado_pago_service import MercadoPagoService
+from app.services.mercadopago_service import MercadoPagoService
 
 
 async def test_notification_merchant_order_opened_leaves_payment_status_pending(

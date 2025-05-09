@@ -7,8 +7,8 @@ from fastapi import Request
 
 from app.core.config import settings
 from app.models.payment import PaymentStatus, PaymentUpdate
-from app.services.mercado_pago_payments_service import MercadoPagoPaymentsService
-from app.services.mercado_pago_service import MercadoPagoService
+from app.services.mercadopago_payments_service import MercadoPagoPaymentsService
+from app.services.mercadopago_service import MercadoPagoService
 from app.services.payments_service import PaymentsService
 from app.utilities.dependencies import SessionDep
 from app.utilities.exceptions import NotAuthorizedException

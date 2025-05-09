@@ -11,7 +11,7 @@ from app.models.mercado_pago_payment import (
 )
 from app.models.payment import Payment
 from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
-from app.services.mercado_pago_service import MercadoPagoService
+from app.services.mercadopago_service import MercadoPagoService
 from app.utilities.dependencies import SessionDep
 
 logging.basicConfig(level=logging.INFO)

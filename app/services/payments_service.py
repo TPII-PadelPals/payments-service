@@ -8,7 +8,7 @@ from app.models.match_extended import MatchExtended
 from app.models.payment import Payment, PaymentCreate, PaymentExtended, PaymentUpdate
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
-from app.services.mercado_pago_payments_service import MercadoPagoPaymentsService
+from app.services.mercadopago_payments_service import MercadoPagoPaymentsService
 from app.utilities.dependencies import SessionDep
 
 logging.basicConfig(level=logging.INFO)

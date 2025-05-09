@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Request, Response, status
 
-from app.services.mercado_pago_notifications_service import (
+from app.services.mercadopago_notifications_service import (
     MercadoPagoNotificationsService,
 )
 from app.utilities.dependencies import SessionDep
