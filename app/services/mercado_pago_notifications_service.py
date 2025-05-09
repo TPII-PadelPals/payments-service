@@ -100,5 +100,5 @@ class MercadoPagoNotificationsService:
                 )
                 payment_update = PaymentUpdate(status=PaymentStatus.PAID)
                 await PaymentsRepository(session).update_payment(
-                    mp_payment.public_id, payment_update
+                    payment_update, public_id=mp_payment.public_id
                 )

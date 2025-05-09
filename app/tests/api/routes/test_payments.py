@@ -119,7 +119,7 @@ async def test_create_match_payment_stores_payment_data(
     payment_url = content["pay_url"]
     preference_id = payment_url.split("pref_id=")[1]
     PayRepo = PaymentsRepository(session)
-    payment = await PayRepo.get_payment(payment_public_id)
+    payment = await PayRepo.get_payment(public_id=payment_public_id)
     assert str(payment.public_id) == payment_public_id
     assert str(payment.match_public_id) == match_public_id
     assert str(payment.user_public_id) == user_public_id

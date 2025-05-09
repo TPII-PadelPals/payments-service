@@ -74,7 +74,7 @@ async def test_notification_merchant_order_opened_leaves_payment_status_pending(
     )
     assert response.status_code == 200
 
-    result_payment = await pay_repo.get_payment(payment.public_id)
+    result_payment = await pay_repo.get_payment(public_id=payment.public_id)
     assert result_payment.status == PaymentStatus.PENDING
 
 
@@ -136,7 +136,7 @@ async def test_notification_merchant_order_closed_sets_payment_status_paid(
     )
     assert response.status_code == 200
 
-    result_payment = await pay_repo.get_payment(payment.public_id)
+    result_payment = await pay_repo.get_payment(public_id=payment.public_id)
     assert result_payment.status == PaymentStatus.PAID
 
 
@@ -209,5 +209,5 @@ async def test_notification_payment_merchant_order_closed_sets_payment_status_pa
     )
     assert response.status_code == 200
 
-    result_payment = await pay_repo.get_payment(payment.public_id)
+    result_payment = await pay_repo.get_payment(public_id=payment.public_id)
     assert result_payment.status == PaymentStatus.PAID

@@ -1,38 +1,21 @@
-from uuid import UUID
-
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
+from typing import Any
 
 from app.models.payment import Payment, PaymentCreate, PaymentUpdate
-from app.utilities.exceptions import NotFoundException
+from app.repository.base_repository import BaseRepository
 
 
-class PaymentsRepository:
-    def __init__(self, session: AsyncSession) -> None:
-        self.session = session
+class PaymentsRepository(BaseRepository):
+    async def create_payment(
+        self, payment_create: PaymentCreate, should_commit: bool = True
+    ) -> Payment:
+        return await self.create_record(Payment, payment_create, should_commit)
 
-    async def create_payment(self, payment_create: PaymentCreate) -> Payment:
-        payment = Payment.model_validate(payment_create)
-        self.session.add(payment)
-        await self.session.commit()
-        await self.session.refresh(payment)
-        return payment
-
-    async def get_payment(self, public_id: UUID) -> Payment:
-        query = select(Payment).where(Payment.public_id == public_id)
-        result = await self.session.exec(query)
-        payment = result.first()
-        if payment is None:
-            raise NotFoundException(f"Payment '{public_id}'")
-        return payment
+    async def get_payment(self, **filters: Any) -> Payment:
+        return await self.get_record(Payment, **filters)
 
     async def update_payment(
-        self, public_id: UUID, payment_update: PaymentUpdate
+        self, payment_update: PaymentUpdate, should_commit: bool = True, **filters: Any
     ) -> Payment:
-        payment = await self.get_payment(public_id)
-        update_dict = payment_update.model_dump(exclude_none=True)
-        payment.sqlmodel_update(update_dict)
-        self.session.add(payment)
-        await self.session.commit()
-        await self.session.refresh(payment)
-        return payment
+        return await self.update_record(
+            Payment, payment_update, should_commit, **filters
+        )
