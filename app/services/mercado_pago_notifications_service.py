@@ -102,14 +102,3 @@ class MercadoPagoNotificationsService:
                 await PaymentsRepository(session).update_payment(
                     mp_payment.public_id, payment_update
                 )
-
-        # total_paid = 0
-        # for payment in merchant_order["payments"]:
-        #     if payment["status"] == "approved":
-        #         total_paid += payment["transaction_amount"]
-
-        # item_title = merchant_order["items"][0]["title"]
-        # if total_paid >= merchant_order["total_amount"]:
-        #     logger.info(f"[Merchant Order] '{item_title}': DONE")
-        # else:
-        #     logger.info(f"[Merchant Order] '{item_title}': WIP")
