@@ -7,7 +7,7 @@ from app.models.match_extended import MatchExtended
 from app.models.payment import Payment, PaymentCreate, PaymentExtended
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
-from app.services.mercado_pago_payment_service import MercadoPagoPaymentService
+from app.services.mercado_pago_payments_service import MercadoPagoPaymentsService
 from app.utilities.dependencies import SessionDep
 
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 mp_sdk = settings.MERCADO_PAGO_SDK
 
 
-class PaymentService:
+class PaymentsService:
     N_PLAYERS = 4
 
     def get_payment_title(
@@ -57,7 +57,7 @@ class PaymentService:
                 session, match_extended, court, should_commit=False
             )
 
-            mp_payment = await MercadoPagoPaymentService().create_payment(
+            mp_payment = await MercadoPagoPaymentsService().create_payment(
                 session, payment, payment_title, should_commit=False
             )
 

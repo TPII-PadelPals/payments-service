@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 mp_sdk = settings.MERCADO_PAGO_SDK
 
 
-class MercadoPagoPaymentService:
+class MercadoPagoPaymentsService:
     N_PLAYERS = 4
 
     def get_payment_title(
