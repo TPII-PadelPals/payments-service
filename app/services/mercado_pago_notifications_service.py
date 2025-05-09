@@ -6,12 +6,17 @@ import urllib.parse
 from fastapi import Request
 
 from app.core.config import settings
+from app.models.payment import PaymentStatus, PaymentUpdate
+from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
+from app.repository.payments_repository import PaymentsRepository
+from app.services.mercado_pago_service import MercadoPagoService
+from app.utilities.dependencies import SessionDep
 from app.utilities.exceptions import NotAuthorizedException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-mp_sdk = settings.MERCADO_PAGO_SDK
+mp_service = MercadoPagoService(settings.MERCADO_PAGO_SDK)
 
 
 class MercadoPagoNotificationsService:
@@ -62,7 +67,7 @@ class MercadoPagoNotificationsService:
             # HMAC verification failed
             raise NotAuthorizedException()
 
-    async def process_request(self, request: Request) -> None:
+    async def process_request(self, session: SessionDep, request: Request) -> None:
         self.verify_request(request)
 
         body = await request.json()
@@ -77,7 +82,7 @@ class MercadoPagoNotificationsService:
         if notification_type == "topic_merchant_order_wh":
             merchant_order_id = ressource_id
         elif notification_type == "payment":
-            payment_response = mp_sdk.payment().get(ressource_id)
+            payment_response = mp_service.get_payment(ressource_id)
             payment = payment_response["response"]
             merchant_order_id = payment["order"]["id"]
         else:
@@ -86,16 +91,25 @@ class MercadoPagoNotificationsService:
             logger.info(f"{await request.json() = }")
 
         if merchant_order_id:
-            merchant_order_response = mp_sdk.merchant_order().get(merchant_order_id)
+            merchant_order_response = mp_service.get_merchant_order(merchant_order_id)
             merchant_order = merchant_order_response["response"]
+            if merchant_order["status"] == "closed":
+                preference_id = merchant_order["preference_id"]
+                mp_payment = await MercadoPagoPaymentsRepository(session).get_payment(
+                    preference_id=preference_id
+                )
+                payment_update = PaymentUpdate(status=PaymentStatus.PAID)
+                await PaymentsRepository(session).update_payment(
+                    mp_payment.public_id, payment_update
+                )
 
-            total_paid = 0
-            for payment in merchant_order["payments"]:
-                if payment["status"] == "approved":
-                    total_paid += payment["transaction_amount"]
+        # total_paid = 0
+        # for payment in merchant_order["payments"]:
+        #     if payment["status"] == "approved":
+        #         total_paid += payment["transaction_amount"]
 
-            item_title = merchant_order["items"][0]["title"]
-            if total_paid >= merchant_order["total_amount"]:
-                logger.info(f"[Merchant Order] '{item_title}': DONE")
-            else:
-                logger.info(f"[Merchant Order] '{item_title}': WIP")
+        # item_title = merchant_order["items"][0]["title"]
+        # if total_paid >= merchant_order["total_amount"]:
+        #     logger.info(f"[Merchant Order] '{item_title}': DONE")
+        # else:
+        #     logger.info(f"[Merchant Order] '{item_title}': WIP")

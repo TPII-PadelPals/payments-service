@@ -1,4 +1,4 @@
-from uuid import UUID
+from typing import Any
 
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -20,12 +20,17 @@ class MercadoPagoPaymentsRepository:
         await self.session.refresh(payment)
         return payment
 
-    async def get_payment(self, public_id: UUID) -> MercadoPagoPayment:
-        query = select(MercadoPagoPayment).where(
-            MercadoPagoPayment.public_id == public_id
-        )
+    async def get_payments(self, **filters: Any) -> list[MercadoPagoPayment]:
+        query = select(MercadoPagoPayment)
+        for key, value in filters.items():
+            attr = getattr(MercadoPagoPayment, key)
+            query = query.where(attr == value)
         result = await self.session.exec(query)
-        payment = result.first()
-        if payment is None:
-            raise NotFoundException(f"MercadoPago Payment '{public_id}'")
-        return payment
+        payments = list(result.all())
+        return payments
+
+    async def get_payment(self, **filters: Any) -> MercadoPagoPayment:
+        payments = await self.get_payments(**filters)
+        if not payments:
+            raise NotFoundException(f"MercadoPago Payment '{filters}'")
+        return payments[0]

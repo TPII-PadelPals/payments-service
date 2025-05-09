@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.models.payment import Payment, PaymentCreate
+from app.models.payment import Payment, PaymentCreate, PaymentUpdate
 from app.utilities.exceptions import NotFoundException
 
 
@@ -24,4 +24,15 @@ class PaymentsRepository:
         payment = result.first()
         if payment is None:
             raise NotFoundException(f"Payment '{public_id}'")
+        return payment
+
+    async def update_payment(
+        self, public_id: UUID, payment_update: PaymentUpdate
+    ) -> Payment:
+        payment = await self.get_payment(public_id)
+        update_dict = payment_update.model_dump(exclude_none=True)
+        payment.sqlmodel_update(update_dict)
+        self.session.add(payment)
+        await self.session.commit()
+        await self.session.refresh(payment)
         return payment
