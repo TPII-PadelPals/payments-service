@@ -118,15 +118,15 @@ async def test_create_match_payment_stores_payment_data(
     payment_public_id = content["public_id"]
     payment_url = content["pay_url"]
     preference_id = payment_url.split("pref_id=")[1]
-    PayRepo = PaymentsRepository(session)
-    payment = await PayRepo.get_payment(public_id=payment_public_id)
+    pay_repo = PaymentsRepository(session)
+    payment = await pay_repo.get_payment(public_id=payment_public_id)
     assert str(payment.public_id) == payment_public_id
     assert str(payment.match_public_id) == match_public_id
     assert str(payment.user_public_id) == user_public_id
     assert payment.amount == court_price / 4
     assert payment.status == PaymentStatus.PENDING
 
-    MPPayRepo = MercadoPagoPaymentsRepository(session)
-    mp_payment = await MPPayRepo.get_payment(public_id=payment_public_id)
+    mp_pay_repo = MercadoPagoPaymentsRepository(session)
+    mp_payment = await mp_pay_repo.get_payment(public_id=payment_public_id)
     assert str(mp_payment.public_id) == payment_public_id
     assert mp_payment.preference_id == preference_id
