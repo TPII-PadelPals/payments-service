@@ -5,6 +5,9 @@ from app.repository.base_repository import BaseRepository
 
 
 class PaymentsRepository(BaseRepository):
+    # def _handle_commit_exceptions(self, err: IntegrityError) -> None:
+    #     raise err
+
     async def create_payment(
         self, payment_create: PaymentCreate, should_commit: bool = True
     ) -> Payment:

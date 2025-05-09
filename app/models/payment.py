@@ -37,5 +37,13 @@ class Payment(PaymentBase, PaymentInmutable, PaymentMutable, table=True):
     __tablename__ = "payments"
 
 
-class PaymentPublic(PaymentBase, PaymentInmutable, PaymentMutable):
+class PaymentURL(SQLModel):
     pay_url: str = Field()
+
+
+class PaymentExtended(Payment, PaymentURL):
+    pass
+
+
+class PaymentExtendedPublic(PaymentBase, PaymentInmutable, PaymentMutable, PaymentURL):
+    pass

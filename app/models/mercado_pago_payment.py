@@ -18,5 +18,9 @@ class MercadoPagoPayment(MercadoPagoPaymentBase, table=True):
     __tablename__ = "mercadopago-payments"
 
 
+class MercadoPagoPaymentExtended(MercadoPagoPayment):
+    pay_url: str = Field()
+
+
 class MercadoPagoPaymentPublic(MercadoPagoPaymentBase):
     pass
