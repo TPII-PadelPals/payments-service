@@ -11,16 +11,15 @@ from app.models.mercado_pago_payment import (
 )
 from app.models.payment import Payment
 from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
+from app.services.mercado_pago_service import MercadoPagoService
 from app.utilities.dependencies import SessionDep
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-mp_sdk = settings.MERCADO_PAGO_SDK
-
 
 class MercadoPagoPaymentsService:
-    N_PLAYERS = 4
+    mp_service = MercadoPagoService(settings.MERCADO_PAGO_SDK)
 
     def get_payment_title(
         self, business: Business, match_extended: MatchExtended
@@ -51,7 +50,7 @@ class MercadoPagoPaymentsService:
             "auto_return": "approved",
         }
 
-        preference_response = mp_sdk.preference().create(preference_data)
+        preference_response = self.mp_service.create_preference(preference_data)
         preference = preference_response["response"]
         preference_id = preference["id"]
         preference_init_point = preference["init_point"]
@@ -59,7 +58,7 @@ class MercadoPagoPaymentsService:
             public_id=payment.public_id, preference_id=preference_id
         )
         mp_payment = await MercadoPagoPaymentsRepository(session).create_payment(
-            mp_payment_create
+            mp_payment_create, should_commit
         )
 
         return MercadoPagoPaymentExtended(

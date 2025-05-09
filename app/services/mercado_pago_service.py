@@ -10,3 +10,6 @@ class MercadoPagoService:
 
     def get_payment(self, payment_id: int) -> Any:
         return self.mp_sdk.payment().get(payment_id)
+
+    def create_preference(self, preference_data: dict[str, Any]) -> Any:
+        return self.mp_sdk.preference().create(preference_data)
