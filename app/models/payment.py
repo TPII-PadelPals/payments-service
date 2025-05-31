@@ -28,7 +28,7 @@ class PaymentUpdate(PaymentMutable):
 
 
 class PaymentInmutable(SQLModel):
-    public_id: UUID = Field(default=uuid4(), unique=True)
+    public_id: UUID = Field(default_factory=uuid4, unique=True)
 
 
 class Payment(PaymentBase, PaymentInmutable, PaymentMutable, table=True):
