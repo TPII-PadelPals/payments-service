@@ -26,13 +26,21 @@ class Settings(BaseSettings):
     API_KEY: str
 
     # Services
+    ITEMS_SERVICE_HTTP: bool = True
     ITEMS_SERVICE_HOST: str
     ITEMS_SERVICE_PORT: int | None = None
     ITEMS_SERVICE_API_KEY: str | None = None
 
+    BUSINESS_SERVICE_HTTP: bool = True
+    BUSINESS_SERVICE_HOST: str
+    BUSINESS_SERVICE_PORT: int | None = None
+    BUSINESS_SERVICE_API_KEY: str | None = None
+
     MERCADO_PAGO_PROD_ACCESS_TOKEN: str
     MERCADO_PAGO_NOTIFICATION_SECRET_KEY: str
     MERCADO_PAGO_NOTIFICATION_TEST_ID: str
+
+    BOT_NAME: str
 
     # Testing
     POSTGRES_DB_TESTING: str
@@ -53,6 +61,11 @@ class Settings(BaseSettings):
     @property
     def MERCADO_PAGO_SDK(self) -> Any:
         return mercadopago.SDK(self.MERCADO_PAGO_PROD_ACCESS_TOKEN)
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def BOT_URL(self) -> Any:
+        return f"https://t.me/{self.BOT_NAME}"
 
 
 class TestSettings(Settings):

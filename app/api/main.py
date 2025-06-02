@@ -20,8 +20,5 @@ api_router_with_api_key.include_router(
 
 api_router_without_api_key = APIRouter()
 api_router_without_api_key.include_router(
-    notifications.router,
-    prefix=f"{ROOT_ROUTE}/notifications",
-    tags=["notifications"],
-    dependencies=[],
+    notifications.router, prefix=f"{ROOT_ROUTE}/notifications", tags=["notifications"]
 )
