@@ -1,17 +1,10 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-  echo "Uso: $0 <DNS_EC2>"
-  exit 1
-fi
-
-DNS_EC2=$1
-
 # Mata procesos previos de ngrok (opcional)
 killall ngrok > /dev/null 2>&1
 
 # Inicia ngrok en segundo plano (ajusta el puerto según tu servicio)
-nohup ngrok http http://$DNS_EC2:8005 > /dev/null 2>&1 &
+nohup ngrok http http://localhost:8005 > /dev/null 2>&1 &
 
 # Espera a que ngrok levante
 sleep 4
