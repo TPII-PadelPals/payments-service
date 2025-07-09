@@ -4,10 +4,11 @@ from typing import Any
 from app.core.config import settings
 from app.models.business import Business
 from app.models.courts import Court
-from app.models.match_extended import MatchExtended
+from app.models.match_extended import MatchExtended, MatchPlayer
 from app.models.payment import Payment, PaymentCreate, PaymentExtended, PaymentUpdate
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
+from app.services.matches_service import MatchesService
 from app.services.mercadopago_payments_service import MercadoPagoPaymentsService
 from app.utilities.dependencies import SessionDep
 
@@ -45,9 +46,13 @@ class PaymentsService:
         return payment
 
     async def create_payment(
-        self, session: SessionDep, match_extended: MatchExtended
+        self, session: SessionDep, match_player: MatchPlayer
     ) -> PaymentExtended:
         try:
+            matches_service = MatchesService()
+            match_extended = await matches_service.get_player_match(
+                match_player.user_public_id, match_player.match_public_id
+            )
             business_service = BusinessService()
             court = await business_service.get_court(match_extended.court_public_id)
             business = await business_service.get_business(court.business_public_id)
