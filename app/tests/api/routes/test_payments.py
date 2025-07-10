@@ -9,7 +9,7 @@ from app.models.business import Business
 from app.models.courts import Court
 from app.models.match_extended import MatchExtended, MatchPlayer
 from app.models.mercadopago_payment import MercadoPagoPaymentCreate
-from app.models.payment import PaymentCreate, PaymentStatus
+from app.models.payment import PaymentCreate, PaymentStatus, PaymentUpdate
 from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
@@ -264,3 +264,54 @@ async def test_create_match_payment_returns_same_payment_data_if_status_pending(
     assert content["amount"] == test_data.amount
     assert content["pay_url"] == test_data.pay_url
     assert content["status"] == PaymentStatus.PENDING
+
+
+async def test_create_match_payment_returns_same_payment_data_if_status_paid(
+    session: AsyncSession, async_client: AsyncClient, x_api_key_header: dict[str, str]
+) -> None:
+    class test_data:
+        user_public_id = str(uuid.uuid4())
+        match_public_id = str(uuid.uuid4())
+        amount = 20_000
+        preference_id = str(uuid.uuid4())
+        pay_url = "https://this-is-a-pay-url.com"
+
+    payload = {
+        "user_public_id": test_data.user_public_id,
+        "match_public_id": test_data.match_public_id,
+    }
+    payment = await PaymentsRepository(session).create_payment(
+        PaymentCreate(
+            user_public_id=test_data.user_public_id,
+            match_public_id=test_data.match_public_id,
+            amount=test_data.amount,
+        ),
+        should_commit=True,
+    )
+    _mp_payment = await MercadoPagoPaymentsRepository(session).create_payment(
+        MercadoPagoPaymentCreate(
+            public_id=payment.public_id,
+            preference_id=test_data.preference_id,
+            pay_url=test_data.pay_url,
+        ),
+        should_commit=True,
+    )
+    payment = await PaymentsRepository(session).update_payment(
+        PaymentUpdate(public_id=payment.public_id, status=PaymentStatus.PAID),
+        should_commit=True,
+    )
+    assert payment.status == PaymentStatus.PAID
+
+    response = await async_client.post(
+        f"{settings.API_V1_STR}/payments/",
+        headers=x_api_key_header,
+        json=payload,
+    )
+    assert response.status_code == 201
+    content = response.json()
+    assert content["public_id"] == str(payment.public_id)
+    assert content["match_public_id"] == test_data.match_public_id
+    assert content["user_public_id"] == test_data.user_public_id
+    assert content["amount"] == test_data.amount
+    assert content["pay_url"] == test_data.pay_url
+    assert content["status"] == PaymentStatus.PAID
