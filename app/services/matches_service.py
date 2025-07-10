@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.core.config import settings
-from app.models.match_extended import MatchExtended
+from app.models.match_extended import MatchExtended, MatchPlayer, ReserveStatus
 from app.utilities.exceptions import NotFoundException
 
 from .base_service import BaseService
@@ -29,3 +29,12 @@ class MatchesService(BaseService):
             if match_extended["public_id"] == str(match_public_id):
                 return MatchExtended(**match_extended)
         raise NotFoundException(f"Match '{match_public_id}'")
+
+    async def update_match_player(
+        self, user_public_id: UUID, match_public_id: UUID, status: ReserveStatus
+    ) -> MatchPlayer:
+        payload = {"reserve": status}
+        match_player = await self.patch(
+            f"/api/v1/matches/{match_public_id}/players/{user_public_id}", json=payload
+        )
+        return MatchPlayer(**match_player)

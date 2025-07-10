@@ -4,8 +4,14 @@ from typing import Any
 from app.core.config import settings
 from app.models.business import Business
 from app.models.courts import Court
-from app.models.match_extended import MatchExtended, MatchPlayer
-from app.models.payment import Payment, PaymentCreate, PaymentExtended, PaymentUpdate
+from app.models.match_extended import MatchExtended, MatchPlayer, ReserveStatus
+from app.models.payment import (
+    Payment,
+    PaymentCreate,
+    PaymentExtended,
+    PaymentStatus,
+    PaymentUpdate,
+)
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
 from app.services.matches_service import MatchesService
@@ -90,9 +96,14 @@ class PaymentsService:
     async def update_payment(
         self, session: SessionDep, payment_update: PaymentUpdate, **filters: Any
     ) -> Payment:
-        return await PaymentsRepository(session).update_payment(
+        payment = await PaymentsRepository(session).update_payment(
             payment_update, **filters
         )
+        if payment.status == PaymentStatus.PAID:
+            await MatchesService().update_match_player(
+                payment.user_public_id, payment.match_public_id, ReserveStatus.INSIDE
+            )
+        return payment
 
     async def get_payment(self, session: SessionDep, **filters: Any) -> PaymentExtended:
         payment = await PaymentsRepository(session).get_payment(**filters)
