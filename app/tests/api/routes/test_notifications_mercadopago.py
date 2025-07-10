@@ -23,6 +23,7 @@ async def test_notification_merchant_order_opened_leaves_payment_status_pending(
     monkeypatch: Any,
 ) -> None:
     payment_preference_id = str(uuid.uuid4())
+    pay_url = f"https://www.mercadopago.com/mla/checkout/start?pref_id={payment_preference_id}"
 
     pay_repo = PaymentsRepository(session)
     payment = await pay_repo.create_payment(
@@ -35,7 +36,9 @@ async def test_notification_merchant_order_opened_leaves_payment_status_pending(
     mp_pay_repo = MercadoPagoPaymentsRepository(session)
     await mp_pay_repo.create_payment(
         MercadoPagoPaymentCreate(
-            public_id=payment.public_id, preference_id=payment_preference_id
+            public_id=payment.public_id,
+            preference_id=payment_preference_id,
+            pay_url=pay_url,
         )
     )
 
@@ -85,6 +88,7 @@ async def test_notification_merchant_order_closed_sets_payment_status_paid(
     monkeypatch: Any,
 ) -> None:
     payment_preference_id = str(uuid.uuid4())
+    pay_url = f"https://www.mercadopago.com/mla/checkout/start?pref_id={payment_preference_id}"
 
     pay_repo = PaymentsRepository(session)
     payment = await pay_repo.create_payment(
@@ -97,7 +101,9 @@ async def test_notification_merchant_order_closed_sets_payment_status_paid(
     mp_pay_repo = MercadoPagoPaymentsRepository(session)
     await mp_pay_repo.create_payment(
         MercadoPagoPaymentCreate(
-            public_id=payment.public_id, preference_id=payment_preference_id
+            public_id=payment.public_id,
+            preference_id=payment_preference_id,
+            pay_url=pay_url,
         )
     )
 
@@ -147,6 +153,7 @@ async def test_notification_payment_merchant_order_closed_sets_payment_status_pa
     monkeypatch: Any,
 ) -> None:
     payment_preference_id = str(uuid.uuid4())
+    pay_url = f"https://www.mercadopago.com/mla/checkout/start?pref_id={payment_preference_id}"
 
     pay_repo = PaymentsRepository(session)
     payment = await pay_repo.create_payment(
@@ -159,7 +166,9 @@ async def test_notification_payment_merchant_order_closed_sets_payment_status_pa
     mp_pay_repo = MercadoPagoPaymentsRepository(session)
     await mp_pay_repo.create_payment(
         MercadoPagoPaymentCreate(
-            public_id=payment.public_id, preference_id=payment_preference_id
+            public_id=payment.public_id,
+            preference_id=payment_preference_id,
+            pay_url=pay_url,
         )
     )
 

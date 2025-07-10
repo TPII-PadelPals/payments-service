@@ -8,7 +8,8 @@ from app.core.config import settings
 from app.models.business import Business
 from app.models.courts import Court
 from app.models.match_extended import MatchExtended, MatchPlayer
-from app.models.payment import PaymentStatus
+from app.models.mercadopago_payment import MercadoPagoPaymentCreate
+from app.models.payment import PaymentCreate, PaymentStatus
 from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
@@ -30,6 +31,9 @@ async def test_create_match_payment_returns_payment_data(
         time = 9
         date = "2025-05-01"
         preference_id = str(uuid.uuid4())
+        pay_url = (
+            f"https://www.mercadopago.com/mla/checkout/start?pref_id={preference_id}"
+        )
 
     payload = {
         "user_public_id": test_data.user_public_id,
@@ -86,7 +90,7 @@ async def test_create_match_payment_returns_payment_data(
         preference_response = {
             "response": {
                 "id": test_data.preference_id,
-                "init_point": f"https://www.mercadopago.com/mla/checkout/start?pref_id={test_data.preference_id}",
+                "init_point": test_data.pay_url,
             }
         }
         return preference_response
@@ -104,7 +108,7 @@ async def test_create_match_payment_returns_payment_data(
     assert content["match_public_id"] == test_data.match_public_id
     assert content["user_public_id"] == test_data.user_public_id
     assert content["amount"] == test_data.court_price / PaymentsService.N_PLAYERS
-    assert content["pay_url"] is not None
+    assert content["pay_url"] == test_data.pay_url
 
 
 async def test_create_match_payment_stores_payment_data(
@@ -123,6 +127,9 @@ async def test_create_match_payment_stores_payment_data(
         time = 9
         date = "2025-05-01"
         preference_id = str(uuid.uuid4())
+        pay_url = (
+            f"https://www.mercadopago.com/mla/checkout/start?pref_id={preference_id}"
+        )
 
     payload = {
         "user_public_id": test_data.user_public_id,
@@ -177,10 +184,7 @@ async def test_create_match_payment_stores_payment_data(
         preference_data: dict[str, Any],  # noqa: ARG001
     ) -> Any:
         preference_response = {
-            "response": {
-                "id": test_data.preference_id,
-                "init_point": f"https://www.mercadopago.com/mla/checkout/start?pref_id={test_data.preference_id}",
-            }
+            "response": {"id": test_data.preference_id, "init_point": test_data.pay_url}
         }
         return preference_response
 
@@ -212,3 +216,51 @@ async def test_create_match_payment_stores_payment_data(
     mp_payment = await mp_pay_repo.get_payment(public_id=payment_public_id)
     assert str(mp_payment.public_id) == payment_public_id
     assert mp_payment.preference_id == test_data.preference_id
+    assert mp_payment.pay_url == test_data.pay_url
+
+
+async def test_create_match_payment_returns_same_payment_data_if_status_pending(
+    session: AsyncSession, async_client: AsyncClient, x_api_key_header: dict[str, str]
+) -> None:
+    class test_data:
+        user_public_id = str(uuid.uuid4())
+        match_public_id = str(uuid.uuid4())
+        amount = 20_000
+        preference_id = str(uuid.uuid4())
+        pay_url = "https://this-is-a-pay-url.com"
+
+    payload = {
+        "user_public_id": test_data.user_public_id,
+        "match_public_id": test_data.match_public_id,
+    }
+    payment = await PaymentsRepository(session).create_payment(
+        PaymentCreate(
+            user_public_id=test_data.user_public_id,
+            match_public_id=test_data.match_public_id,
+            amount=test_data.amount,
+        ),
+        should_commit=True,
+    )
+    _mp_payment = await MercadoPagoPaymentsRepository(session).create_payment(
+        MercadoPagoPaymentCreate(
+            public_id=payment.public_id,
+            preference_id=test_data.preference_id,
+            pay_url=test_data.pay_url,
+        ),
+        should_commit=True,
+    )
+    assert payment.status == PaymentStatus.PENDING
+
+    response = await async_client.post(
+        f"{settings.API_V1_STR}/payments/",
+        headers=x_api_key_header,
+        json=payload,
+    )
+    assert response.status_code == 201
+    content = response.json()
+    assert content["public_id"] == str(payment.public_id)
+    assert content["match_public_id"] == test_data.match_public_id
+    assert content["user_public_id"] == test_data.user_public_id
+    assert content["amount"] == test_data.amount
+    assert content["pay_url"] == test_data.pay_url
+    assert content["status"] == PaymentStatus.PENDING

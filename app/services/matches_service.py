@@ -23,7 +23,7 @@ class MatchesService(BaseService):
         self, user_public_id: UUID, match_public_id: UUID
     ) -> MatchExtended:
         matches_extended = (
-            await self.get(f"/api/v1/players/{user_public_id}/matches")
+            await self.get(f"/api/v1/players/{user_public_id}/matches/")
         )["data"]
         for match_extended in matches_extended:
             if match_extended["public_id"] == str(match_public_id):

@@ -11,6 +11,7 @@ from app.services.business_service import BusinessService
 from app.services.matches_service import MatchesService
 from app.services.mercadopago_payments_service import MercadoPagoPaymentsService
 from app.utilities.dependencies import SessionDep
+from app.utilities.exceptions import NotFoundException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -48,6 +49,18 @@ class PaymentsService:
     async def create_payment(
         self, session: SessionDep, match_player: MatchPlayer
     ) -> PaymentExtended:
+        # If payment already exists, return it
+        try:
+            payment_extended = await self.get_payment(
+                session,
+                user_public_id=match_player.user_public_id,
+                match_public_id=match_player.match_public_id,
+            )
+            return payment_extended
+        except NotFoundException:
+            pass
+
+        # If not exists, create it
         try:
             matches_service = MatchesService()
             match_extended = await matches_service.get_player_match(
@@ -80,3 +93,10 @@ class PaymentsService:
         return await PaymentsRepository(session).update_payment(
             payment_update, **filters
         )
+
+    async def get_payment(self, session: SessionDep, **filters: Any) -> PaymentExtended:
+        payment = await PaymentsRepository(session).get_payment(**filters)
+        mp_payment = await MercadoPagoPaymentsService().get_payment(
+            session, public_id=payment.public_id
+        )
+        return PaymentExtended(pay_url=mp_payment.pay_url, **payment.model_dump())
