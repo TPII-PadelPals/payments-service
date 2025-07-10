@@ -35,6 +35,6 @@ class MatchesService(BaseService):
     ) -> MatchPlayer:
         payload = {"reserve": status}
         match_player = await self.patch(
-            f"/api/v1/matches/{match_public_id}/players/{user_public_id}", json=payload
+            f"/api/v1/matches/{match_public_id}/players/{user_public_id}/", json=payload
         )
         return MatchPlayer(**match_player)
