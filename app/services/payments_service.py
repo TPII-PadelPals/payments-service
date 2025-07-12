@@ -18,7 +18,7 @@ mp_sdk = settings.MERCADO_PAGO_SDK
 
 
 class PaymentsService:
-    N_PLAYERS = 4
+    N_PLAYERS = 2
 
     def get_payment_title(
         self, business: Business, match_extended: MatchExtended

@@ -12,6 +12,7 @@ from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRe
 from app.repository.payments_repository import PaymentsRepository
 from app.services.business_service import BusinessService
 from app.services.mercadopago_service import MercadoPagoService
+from app.services.payments_service import PaymentsService
 
 
 async def test_create_match_payment_returns_payment_data(
@@ -78,7 +79,7 @@ async def test_create_match_payment_returns_payment_data(
     assert content["public_id"] is not None
     assert content["match_public_id"] == match_public_id
     assert content["user_public_id"] == user_public_id
-    assert content["amount"] == court_price / 4
+    assert content["amount"] == court_price / PaymentsService.N_PLAYERS
     assert content["pay_url"] is not None
 
 
@@ -158,7 +159,7 @@ async def test_create_match_payment_stores_payment_data(
     assert str(payment.public_id) == payment_public_id
     assert str(payment.match_public_id) == match_public_id
     assert str(payment.user_public_id) == user_public_id
-    assert payment.amount == court_price / 4
+    assert payment.amount == court_price / PaymentsService.N_PLAYERS
     assert payment.status == PaymentStatus.PENDING
 
     mp_pay_repo = MercadoPagoPaymentsRepository(session)
