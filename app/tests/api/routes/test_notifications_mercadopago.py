@@ -296,8 +296,6 @@ async def test_notification_merchant_order_closed_sets_match_status_confirmed(
     mock_update_match_player = AsyncMock()
     monkeypatch.setattr(MatchesService, "update_match_player", mock_update_match_player)
 
-    monkeypatch.setattr(MatchesService, "update_match_player", mock_update_match_player)
-
     # Test payment notification
     notification = {
         "type": "payment",
