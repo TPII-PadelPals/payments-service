@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, status
 
-from app.models.match_extended import MatchExtended
+from app.models.match_extended import MatchPlayer
 from app.models.payment import PaymentExtendedPublic
 from app.services.payments_service import PaymentsService
 from app.utilities.dependencies import SessionDep
@@ -17,6 +17,6 @@ router = APIRouter()
 )
 async def create_payment(
     session: SessionDep,
-    match_extended: MatchExtended,
+    match_player: MatchPlayer,
 ) -> Any:
-    return await PaymentsService().create_payment(session, match_extended)
+    return await PaymentsService().create_payment(session, match_player)
