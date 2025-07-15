@@ -25,10 +25,23 @@ class MatchesService(BaseService):
         matches_extended = (
             await self.get(f"/api/v1/players/{user_public_id}/matches/")
         )["data"]
+        match_extended = None
         for match_extended in matches_extended:
             if match_extended["public_id"] == str(match_public_id):
-                return MatchExtended(**match_extended)
-        raise NotFoundException(f"Match '{match_public_id}'")
+                match_extended = MatchExtended(**match_extended)
+                break
+
+        if match_extended is None:
+            raise NotFoundException(f"Match '{match_public_id}'")
+
+        match_players = []
+        for match_player in match_extended.match_players:
+            if match_player.user_public_id == user_public_id:
+                match_players.append(match_player)
+                break
+        match_extended.match_players = match_players
+
+        return match_extended  # type: ignore
 
     async def update_match_player(
         self, user_public_id: UUID, match_public_id: UUID, status: ReserveStatus
