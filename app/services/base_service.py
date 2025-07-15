@@ -67,23 +67,21 @@ class BaseService:
             response = await client.post(url, data=data, json=json, headers=all_headers)
         return await self._handle_response(response)
 
-    async def patch(
+    async def put(
         self,
         endpoint: str,
         data: RequestData | None = None,
         json: Any | None = None,
         headers: dict[str, str] | None = None,
     ) -> Any:
-        """Send a PATCH request."""
+        """Send a PUT request."""
         url = self.generate_url(endpoint)
         all_headers = {**self.base_headers, **(headers or {})}
         logger.info(
-            f"PATCH request to {url}, data: {data}, json: {json}, headers: {all_headers}"
+            f"PUT request to {url}, data: {data}, json: {json}, headers: {all_headers}"
         )
         async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.patch(
-                url, data=data, json=json, headers=all_headers
-            )
+            response = await client.put(url, data=data, json=json, headers=all_headers)
         return await self._handle_response(response)
 
     async def delete(self, endpoint: str, headers: dict[str, str] | None = None) -> Any:

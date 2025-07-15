@@ -1,14 +1,7 @@
 import datetime
-from enum import Enum
 from uuid import UUID
 
 from sqlmodel import Field, SQLModel
-
-
-class ReserveStatus(str, Enum):
-    INSIDE = "inside"
-    REJECTED = "Rejected"
-    OUTSIDE = "outside"
 
 
 class Match(SQLModel):
