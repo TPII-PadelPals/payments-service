@@ -6,7 +6,6 @@ from sqlmodel import Field, SQLModel
 class MercadoPagoPaymentBase(SQLModel):
     public_id: UUID = Field(foreign_key="payments.public_id", ondelete="CASCADE")
     preference_id: str = Field(unique=True)
-    pay_url: str = Field()
 
 
 class MercadoPagoPaymentCreate(MercadoPagoPaymentBase):
@@ -18,9 +17,9 @@ class MercadoPagoPayment(MercadoPagoPaymentBase, table=True):
 
     __tablename__ = "mercadopago-payments"
 
-    @classmethod
-    def name(cls) -> str:
-        return "MercadoPagoPayment"
+
+class MercadoPagoPaymentExtended(MercadoPagoPayment):
+    pay_url: str = Field()
 
 
 class MercadoPagoPaymentPublic(MercadoPagoPaymentBase):

@@ -36,11 +36,6 @@ class Settings(BaseSettings):
     BUSINESS_SERVICE_PORT: int | None = None
     BUSINESS_SERVICE_API_KEY: str | None = None
 
-    MATCHES_SERVICE_HTTP: bool = True
-    MATCHES_SERVICE_HOST: str
-    MATCHES_SERVICE_PORT: int | None = None
-    MATCHES_SERVICE_API_KEY: str | None = None
-
     MERCADO_PAGO_PROD_ACCESS_TOKEN: str
     MERCADO_PAGO_NOTIFICATION_SECRET_KEY: str
     MERCADO_PAGO_NOTIFICATION_TEST_ID: str

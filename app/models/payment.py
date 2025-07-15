@@ -43,10 +43,6 @@ class Payment(PaymentBase, PaymentInmutable, PaymentMutable, table=True):
         ),
     )
 
-    @classmethod
-    def name(cls) -> str:
-        return "Payment"
-
 
 class PaymentURL(SQLModel):
     pay_url: str = Field()
