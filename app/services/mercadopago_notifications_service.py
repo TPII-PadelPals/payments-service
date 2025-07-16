@@ -90,7 +90,11 @@ class MercadoPagoNotificationsService:
 
         body = await request.json()
 
-        ressource_id = body["data"]["id"]
+        try:
+            ressource_id = body["data"]["id"]
+        except Exception:
+            return
+
         if ressource_id == settings.MERCADO_PAGO_NOTIFICATION_TEST_ID:
             return
 
