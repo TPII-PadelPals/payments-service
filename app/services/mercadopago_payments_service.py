@@ -7,7 +7,6 @@ from app.models.match_extended import MatchExtended
 from app.models.mercadopago_payment import (
     MercadoPagoPayment,
     MercadoPagoPaymentCreate,
-    MercadoPagoPaymentExtended,
 )
 from app.models.payment import Payment
 from app.repository.mercadopago_payments_repository import MercadoPagoPaymentsRepository
@@ -32,7 +31,7 @@ class MercadoPagoPaymentsService:
         payment: Payment,
         payment_title: str,
         should_commit: bool = True,
-    ) -> MercadoPagoPaymentExtended:
+    ) -> MercadoPagoPayment:
         preference_data = {
             "items": [
                 {
@@ -55,15 +54,18 @@ class MercadoPagoPaymentsService:
         preference_id = preference["id"]
         preference_init_point = preference["init_point"]
         mp_payment_create = MercadoPagoPaymentCreate(
-            public_id=payment.public_id, preference_id=preference_id
+            public_id=payment.public_id,
+            preference_id=preference_id,
+            pay_url=preference_init_point,
         )
         mp_payment = await MercadoPagoPaymentsRepository(session).create_payment(
             mp_payment_create, should_commit
         )
 
-        return MercadoPagoPaymentExtended(
-            pay_url=preference_init_point, **mp_payment.model_dump()
-        )
+        return mp_payment
+        # return MercadoPagoPaymentExtended(
+        #     pay_url=preference_init_point, **mp_payment.model_dump()
+        # )
 
     async def get_payment(
         self, session: SessionDep, **filters: Any
